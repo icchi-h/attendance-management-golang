@@ -133,7 +133,6 @@ func existTodaysData(file string, date string) int {
 			// エラー処理
 			break
 		}
-		// fmt.Printf("%4d行目: %s\n", i, sc.Text())
 		lastLine = sc.Text()
 	}
 
