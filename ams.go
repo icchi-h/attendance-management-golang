@@ -11,6 +11,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -25,6 +26,7 @@ const OUTPUT_DATE_FORMAT string = "%Y/%m/%d(%a)"
 const OUTPUT_TIME_FORMAT string = "%H:%M"
 const START_COMMAND string = "start"
 const FINISH_COMMAND string = "finish"
+const SHOW_COMMAND string = "show"
 
 func main() {
 
@@ -77,7 +79,10 @@ func main() {
 			fmt.Println("Error: 本日の入社時刻が入力されていません")
 			os.Exit(0)
 		}
-	} else if args[1] == FINISH_COMMAND {
+	} else if args[1] == SHOW_COMMAND {
+		out, err := exec.Command("cat", outputFile).Output()
+		check(err)
+		fmt.Println(string(out))
 	} else {
 		fmt.Println("Command Error: Your command is '" + args[1] + "'\n")
 		errorProcessing()
@@ -85,7 +90,7 @@ func main() {
 }
 
 func errorProcessing() {
-	fmt.Println("Usage: \n\tams command\n\nThe commands are\n\t" + START_COMMAND + "\tRecord the start time\n\t" + FINISH_COMMAND + "\tRecord the finish time")
+	fmt.Println("Usage: \n\tams command\n\nThe commands are\n\t" + START_COMMAND + "\tRecord the start time\n\t" + FINISH_COMMAND + "\tRecord the finish time\n\t" + SHOW_COMMAND + "\tShow log file this month")
 	os.Exit(0)
 }
 
