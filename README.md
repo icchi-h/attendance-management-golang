@@ -29,5 +29,7 @@ ams [start or finish]
 
 ### Show log file
 ```bash
-ams show
+$ ams show
+Date	Start Time	Finish Time
+2017/08/28(Mon)	09:56	21:39
 ```
