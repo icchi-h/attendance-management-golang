@@ -22,6 +22,12 @@ export PATH=$PATH:/path/to/your project/attendance-management-golang/
 
 ## Run
 
-```bash
+### Record
+```
 ams [start or finish]
+```
+
+### Show log file
+```bash
+ams show
 ```
