@@ -14,12 +14,6 @@ go build ams.go
 ln -s /path/to/your project/attendance-management-golang/ams /usr/local/bin/ams
 ```
 
-プロジェクトのディレクトリにパスを通す場合は以下のコマンド
-
-```bash
-export PATH=$PATH:/path/to/your project/attendance-management-golang/
-```
-
 ## Run
 
 ### Record

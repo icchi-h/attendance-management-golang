@@ -1,7 +1,7 @@
 /* Attendance Management Script with golang
  *
  * @author Haruyuki Ichino<mail@icchi.me>
- * @version 0.1
+ * @version 1.0
  * @date 2017/08/27
  */
 
@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -20,7 +21,6 @@ import (
 )
 
 // Constant
-const LOG_DIR string = "./log/"
 const OUTPUT_FILENAME_FORMAT string = "%Y-%m"
 const OUTPUT_DATE_FORMAT string = "%Y/%m/%d(%a)"
 const OUTPUT_TIME_FORMAT string = "%H:%M"
@@ -38,15 +38,24 @@ func main() {
 		errorProcessing()
 	}
 
+	// プロジェクトのパスを取得
+	resultWhich, _ := exec.Command("which", "ams").Output()
+	linkPass, _ := path.Split(string(resultWhich))
+	os.Chdir(linkPass)
+	resultLs, _ := exec.Command("ls", "-l", "ams").Output()
+	var scriptPath, _ = path.Split(strings.TrimSpace(strings.Split(string(resultLs), ">")[1]))
+	// fmt.Println(string(scriptPath))
+
+	var logDir = filepath.Join(scriptPath, "log")
 	var now = time.Now()
-	var outputFile string = filepath.Join(LOG_DIR, timeutil.Strftime(&now, OUTPUT_FILENAME_FORMAT)+".tsv")
+	var outputFile string = filepath.Join(logDir, timeutil.Strftime(&now, OUTPUT_FILENAME_FORMAT)+".tsv")
 	var today = timeutil.Strftime(&now, OUTPUT_DATE_FORMAT)
 	var nowTime = timeutil.Strftime(&now, OUTPUT_TIME_FORMAT)
 
 	if args[1] == START_COMMAND {
 		// start command
 		// fmt.Println("start processing")
-		checkOutputFile(outputFile)
+		checkOutputFile(outputFile, logDir)
 
 		if existTodaysData(outputFile, today) == 0 {
 			// 通常の入社処理
@@ -62,7 +71,7 @@ func main() {
 	} else if args[1] == FINISH_COMMAND {
 		// finish command
 		// fmt.Println("finish processing")
-		checkOutputFile(outputFile)
+		checkOutputFile(outputFile, logDir)
 
 		if existTodaysData(outputFile, today) == 2 {
 			// 通常の退社処理
@@ -81,7 +90,10 @@ func main() {
 		}
 	} else if args[1] == SHOW_COMMAND {
 		out, err := exec.Command("cat", outputFile).Output()
-		check(err)
+		if err != nil {
+			fmt.Println("Error: Not found log file '" + outputFile + "'")
+			os.Exit(0)
+		}
 		fmt.Println(string(out))
 	} else {
 		fmt.Println("Command Error: Your command is '" + args[1] + "'\n")
@@ -100,13 +112,13 @@ func check(e error) {
 	}
 }
 
-func checkOutputFile(file string) {
+func checkOutputFile(file string, logDir string) {
 	// 出力ディレクトリの存在確認
-	_, err := os.Stat(LOG_DIR)
+	_, err := os.Stat(logDir)
 	if err != nil {
 		fmt.Println("Log directory does not exist.")
-		os.Mkdir(LOG_DIR, 0755)
-		fmt.Println("Created log directory '" + LOG_DIR + "'")
+		os.Mkdir(logDir, 0755)
+		fmt.Println("Created log directory '" + logDir + "'")
 	}
 
 	// 出力ファイルの存在確認
